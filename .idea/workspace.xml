@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8918acf1-953d-496c-8b23-95c0664df71d" name="Changes" comment="Commit">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="8918acf1-953d-496c-8b23-95c0664df71d" name="Changes" comment="Commit" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -47,7 +45,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "D:/PyCharm/pplab",
+    "last_opened_file_path": "C:/Users/MaximVanDarholm/Documents/GitHub/desktop-tutorial",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -81,7 +79,7 @@
       <option name="presentableId" value="Default" />
       <updated>1664126442305</updated>
       <workItem from="1664126464533" duration="3426000" />
-      <workItem from="1664133582283" duration="3326000" />
+      <workItem from="1664133582283" duration="4260000" />
     </task>
     <task id="LOCAL-00001" summary="Commit">
       <created>1664136062326</created>
@@ -90,7 +88,14 @@
       <option name="project" value="LOCAL" />
       <updated>1664136062326</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Commit">
+      <created>1664136964541</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1664136964542</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
