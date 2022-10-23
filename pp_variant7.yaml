@@ -1,0 +1,546 @@
+---
+openapi: 3.0.0
+info:
+  title: PP Lab variant 7
+  version: 0.0.1
+tags:
+  - name: audience
+    description: Everything about event
+  - name: order
+    description: Info about tickets
+  - name: user
+    description: Operations about user
+    
+paths:
+  /audience:
+    post:
+      tags:
+        - audience
+      summary: Add new audience
+      description: This can only be done by the admin.
+      operationId: createAudience
+      requestBody:
+        description: Created audience object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Audience'
+      responses:
+        default:
+          description: succesful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Audience'
+      security:
+      - admin_auth:
+        - write:event
+
+  /audience/{id}:
+    get:
+      tags: 
+        - audience
+      summary: Get info about with provided Id
+      description: This can only be done by the logged user.
+      parameters:
+        - name: id
+          in: path
+          description: id of requested audience
+          required: true
+          schema:
+            type: string
+      responses:
+        '404':
+          description: Audience not found
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Audience'
+      security:
+      - admin_auth:
+        - write:event
+
+    put:
+      tags: 
+        - audience
+      summary: Update audience
+      description: This can only be done by the Admin.
+      parameters:
+        - name: id
+          in: path
+          description: id of updated audience
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent user in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Audience'
+      responses:
+        '404':
+          description: Event not found
+        '200':
+          description: successful operation
+      security:
+        - admin_auth:
+            - write:event
+    
+    delete:
+      tags:
+        - audience
+      summary: Delete audience with provided Id
+      description: This can only be done by the admin.
+      parameters:
+        - name: id
+          in: path
+          description: id of deleted audience
+          required: true
+          schema:
+            type: string
+      responses:
+        "400":
+          description: wrong data in input
+        "401":
+          description: unauthorized
+        '404':
+          description: Event not found
+        '200':
+          description: successful operation
+      security:
+        - admin_auth:
+            - write:event
+
+  /order:
+    post:
+      tags:
+        - order
+      summary: Create new order
+      description: This can only be done by the logged user.
+      operationId: createOrder
+      requestBody:
+        description: Created order object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+        required: true
+      responses:
+        '200':
+          description: succesful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        "204":
+          description: No content
+        "400":
+          description: Wrong data
+        "401":
+          description: Audience already reserved or booked
+      security:
+        - user_auth:
+          - write:user
+  /order/{id}:
+    get:
+      tags:
+        - order
+      summary: Get info about order with provided Id
+      description: This can only be done by the logged user.
+      operationId: getOrder
+      parameters:
+        - name: id
+          in: path
+          description: id of requested order
+          required: true
+          schema:
+            type: string
+      responses:
+        '404':
+          description: Order not found
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+      security:
+        - user_auth:
+          - write:user
+    put:
+      tags: 
+        - order
+      summary: Update order
+      description: This can only be done by logged user.
+      operationId: updateOrder
+      parameters:
+        - name: id
+          in: path
+          description: id of updated order
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update an order info
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        "401":
+          description: Audience already reserved or booked
+        '404':
+          description: Order not found
+        '200':
+          description: successful operation   
+      security:
+        - user_auth:
+          - write:user
+    delete:
+      tags:
+        - order
+      summary: Delete order with provided Id
+      description: This can only be done by logged user.
+      operationId: deleteOrder
+      parameters:
+        - name: id
+          in: path
+          description: id of deleted order
+          required: true
+          schema:
+            type: string
+      responses:
+        "400":
+          description: wrong data in input
+        "401":
+          description: Audience already reserved or booked
+        '404':
+          description: Order not found
+        '200':
+          description: successful operation
+      security:
+        - user_auth:
+          - write:user
+  /user:
+    post:
+      tags:
+        - user
+      summary: Register new user
+      description: 'Create new account'
+      operationId: createUser
+      requestBody:
+        description: Created user object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        '200':
+          description: succesful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "204":
+          description: No content
+        "400":
+          description: Some of data's used already
+  /user/createWithList:
+    post:
+      tags:
+      - user
+      summary: Creates list of users with given input array
+      description: Creates list of users with given input array
+      operationId: createUsersWithListInput
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+      responses:
+        "201":
+          description: Successful created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+        "204":
+          description: No content
+        "400":
+          description: Some of data's used already
+      security:
+      - admin_auth:
+        - write:user
+  /user/login:
+    get:
+      tags:
+        - user
+      summary: Logs user into the system
+      operationId: loginUser
+      parameters:
+        - name: username
+          in: query
+          description: The user name for login
+          required: false
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Invalid username/password supplied
+  /user/logout:
+    get:
+      tags:
+        - user
+      summary: Logs out current logged in user session
+      description: 'This action allow you to logout '
+      operationId: logoutUser
+      parameters: []  
+      responses:
+        "200":
+          description: Successful operation
+      security:
+      - user_auth:
+        - write:user
+
+  /user/{id}:
+    get:
+      tags:
+        - user
+      summary: Get user by id
+      description: Return information of user
+      operationId: getUserByID
+      parameters:
+        - name: id
+          in: path
+          description: id that need to be fetched
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+        '400':
+          description: Invalid id supplied
+        '404':
+          description: User not found
+      security:
+      - user_auth:
+        - write:user
+
+    put:
+      tags:
+        - user
+      summary: Update user
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          description: id that need to be fetched
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Some of written data cannot be changed
+        "401":
+          description: Unauthorized
+      security:
+      - user_auth:
+        - write:user
+
+    delete:
+      tags:
+        - user
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      parameters: 
+        - name: id
+          in: path
+          description: The id that needs to be deleted
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User's been successfully deleted
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+      security:
+      - user_auth:
+        - write:user
+
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        username:
+          type: string
+          example: theUser
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: James
+        email:
+          type: string
+          example: john@email.com
+        password:
+          type: string
+          example: '12345'
+        phone:
+          type: string
+          example: '12345'
+    UserInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        username:
+          type: string
+          example: theUser
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: James
+        phone:
+          type: string
+          example: '12345'
+    Audience:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        adress:
+          type: string
+          example: st. Steapana Bandery 16
+        seats_count:
+          type: integer
+          format: int64
+          example: 1000
+        status:
+          type: string
+          enum:
+            - free
+            - reserved
+            - bought
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        audience_id:
+          type: integer
+          format: int64
+          example: 10
+        user_id:
+          type: integer
+          format: int64
+          example: 10
+        status:
+          type: string
+          enum:
+            - reserved
+            - booked
+            - canceled
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+  securitySchemes:
+    user_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://auditionmarketplace.swagger.io/oauth/authorize
+          scopes:
+            write:user: update user
+            read:user: read about user
+    admin_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://auditionmarketplace.swagger.io/oauth/authorize
+          scopes:
+            write:user: manage events
+            read:user: read about user
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
+          
