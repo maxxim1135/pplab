@@ -6,13 +6,14 @@ authors = ["maxlevytskyi2004@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.7.6"
+python = "3.9.13"
 Flask = "^2.2.2"
 waitress = "^2.1.2"
 SQLAlchemy = "1.4.22"
 alembic = "^1.8.1"
 pyodbc = "^4.0.34"
 pymssql = "^2.2.5"
+mysqlclient = "^2.1.1"
 
 
 [build-system]

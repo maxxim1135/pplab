@@ -2,45 +2,28 @@ from sqlalchemy import create_engine, Column, Integer, String, DECIMAL, Boolean,
 from sqlalchemy.orm import declarative_base, sessionmaker, scoped_session
 from models import *
 
-engine = create_engine('mssql+pymssql://sa:Pass123!@localhost/pp_var_7')
-engine.dialect.identifier_preparer.initial_quote = ''
-engine.dialect.identifier_preparer.final_quote = ''
-SessionFactory = sessionmaker(bind=engine)
-Session = scoped_session(SessionFactory)
-Base = declarative_base()
+session = Session
 
-users = [
-    user(username="BrianMay123", firstname="Brian", lastname="May", phone="1231231231", email="brianmay@gmail.com", password="oaoa13o132"),
-    user(username="JimPage", firstname="Jimmy", lastname="Page", phone="151141241", email="jimmypage@gmail.com", password="straesthedan")
-]
+user1 = Users(user_id=1, username="BrianMay123", firstname="Brian", lastname="May", email="brianmay@gmail.com",
+             password="oaoa13o132", phone="1231231231")
+user2 = Users(user_id=2, username="JimPage", firstname="Jimmy", lastname="Page", email="jimmypage@gmail.com",
+             password="straesthedan", phone="151141241")
 
-Audiences = [
-    audience(address="St. Stepana Bandery 16", seats_count=100),
-    audience(address="St. Lychakivska 47", seats_count=120)
-]
+session.add(user1)
+session.add(user2)
+session.commit()
 
-orders = [
-    order(start_time="12.01.1999 12:12:12", end_time="12.01.1999 12:12:12", user_id=1, audience_id=2),
-    order(start_time="12.01.1999 12:12:12", end_time="12.01.1999 12:12:12", user_id=2, audience_id=1)
-]
+audience1 = audience(audience_id=1, address="St. Stepana Bandery 16", seats_count="100")
+audience2 = audience(audience_id=2, address="St. Lychakivska 47", seats_count="120")
 
+session.add(audience1)
+session.add(audience2)
+session.commit()
 
-def create_users():
-    for us in users:
-        Session.add(us)
-    Session.commit()
+order1 = order(order_id=1, start_time="2022-01-05 15:30:00", end_time="2022-02-05 15:30:00", id_user=1, id_audience=2)
+order2 = order(order_id=2, start_time="2022-02-05 15:30:00", end_time="2022-03-05 15:30:00", id_user=2, id_audience=1)
 
+session.add(order1)
+session.add(order2)
 
-def create_audiences():
-    for aud in Audiences:
-        Session.add(aud)
-    Session.commit()
-
-
-def create_ord():
-    for o in orders:
-        Session.add(o)
-    Session.commit()
-
-
-create_users()
+session.commit()

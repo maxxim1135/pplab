@@ -1,14 +1,13 @@
 from flask import Flask
 from flask import jsonify, request
-from marshmallow import exceptions
 from sqlalchemy import exc
-from flask import Response
 
 import db_utils
 from schemas import *
 from models import *
 
 app = Flask(__name__)
+
 
 session = Session()
 
@@ -26,8 +25,6 @@ def create_user():
 @app.route("/user/<int:user_id>", methods=["GET"])
 def get_user(user_id):
     try:
-        # if session.query(Users).filter_by(user_id=user_id).count() == 0:
-        #    return "User not found", 404
         user = db_utils.get_entry_by_uid(Users, user_id)
         return jsonify(UserInfo().dump(user))
     except exc.NoResultFound:
@@ -49,15 +46,16 @@ def update_user():
         return str(err), 400
 
 
-@app.route("/user/", methods=["DELETE"])
-def delete_user():
-    args = request.args
-    user_id = args.get('user_id')
-    if session.query(Users).filter_by(user_id=user_id).count() == 0:
-        return jsonify({"Error404": "User not found"}), 404
-    session.query(Users).filter_by(user_id=user_id).delete()
-    session.commit()
-    return "User deleted", 200
+@app.route("/user/<int:user_id>", methods=["DELETE"])
+def delete_user_orders(user_id):
+    try:
+        user_orders = db_utils.get_orders_by_uid(Order, user_id)
+        for i in user_orders:
+            db_utils.delete_entry_by_oid(Order, i.order_id)
+        db_utils.delete_entry_by_uid(Users, user_id)
+        return "User and user's tickets are deleted", 200
+    except exc.NoResultFound:
+        return jsonify("Error404: User not found"), 404
 
 
 ###########################################################################
@@ -90,6 +88,7 @@ def update_audience():
         audience_data = AddUpdateAudience().load(request.json)
         audience = session.query(Audience).filter_by(audience_id=audience_id).one()
         db_utils.update_entry(audience, **audience_data)
+        session.commit()
         return "Audience update", 200
     except exc.NoResultFound:
         return jsonify({"Error404": "Audience not found"}), 404
@@ -97,15 +96,16 @@ def update_audience():
         return str(err), 400
 
 
-@app.route("/Audience/", methods=["DELETE"])
-def delete_audience():
-    args = request.args
-    audience_id = args.get('audience_id')
-    if session.query(Audience).filter_by(audience_id=audience_id).count() == 0:
-        return "Audience not found", 404
-    session.query(Audience).filter_by(audience_id=audience_id).delete()
-    session.commit()
-    return "Audience deleted", 200
+@app.route("/Audience/<int:audience_id>", methods=["DELETE"])
+def delete_audience_orders(audience_id):
+    try:
+        user_orders = db_utils.get_orders_by_aid(Order, audience_id)
+        for i in user_orders:
+            db_utils.delete_entry_by_oid(Order, i.order_id)
+        db_utils.delete_entry_by_aid(Users, audience_id)
+        return "Audience and user's tickets are deleted", 200
+    except exc.NoResultFound:
+        return jsonify("Error404: Audience not found"), 404
 
 
 ###########################################################################
@@ -114,6 +114,23 @@ def delete_audience():
 def create_order():
     try:
         args = request.get_json()
+        audience_id = args.get('id_audience')
+        end_time = args.get('end_time')
+        start_time = args.get('start_time')
+        if session.query(Order).filter(Order.id_audience == audience_id).count() > 0:
+            if not session.query(Order).filter(Order.id_audience == audience_id). \
+                           filter(start_time >= Order.start_time, end_time <= Order.end_time).count() == 0:
+                raise ValidationError("Order1 exists")
+            elif not session.query(Order).filter(Order.id_audience == audience_id). \
+                    filter(start_time < Order.start_time, end_time >= Order.start_time).count() == 0:
+                raise ValidationError("Order2 exists")
+            elif not session.query(Order).filter(Order.id_audience == audience_id). \
+                    filter(start_time <= Order.end_time, end_time > Order.end_time).count() == 0:
+                raise ValidationError("Order3 exists")
+            elif not session.query(Order).filter(Order.id_audience == audience_id). \
+                    filter(start_time <= "2022-11-13").count() == 0:
+                raise ValidationError("We live in the present and not in the past")
+
         AddOrder_schema = AddOrder()
         order = AddOrder_schema.load(args, session=session)
         session.add(order)
@@ -121,6 +138,8 @@ def create_order():
         return AddOrder_schema.dump(order)
     except ValidationError as err:
         return str(err), 400
+    except exc.NoResultFound:
+        return jsonify({"Error404": "Order not found"}), 404
 
 
 @app.route("/Order/<int:order_id>", methods=["GET"])

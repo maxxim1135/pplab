@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields, validate, ValidationError
 from werkzeug.security import generate_password_hash
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-
+from flask_bcrypt import generate_password_hash
 
 from models import *
 
@@ -23,13 +23,17 @@ class UserRegister(Schema):
     firstname = fields.String()
     lastname = fields.String()
     email = fields.Email(validate=validate_email)
-    password = fields.String()
+    password = fields.Function(
+        deserialize=lambda obj: generate_password_hash(obj), load_only=True
+    )
     phone = fields.String()
 
 
 class UserToUpdate(Schema):
     email = fields.Email(validate=validate_email)
-    password = fields.String()
+    password = fields.Function(
+        deserialize=lambda obj: generate_password_hash(obj), load_only=True
+    )
 
 
 class InfoAudience(Schema):
@@ -66,12 +70,23 @@ def validate_id_audience(id_audience):
     return True
 
 
+def validate_start_time(start_time):
+    if not (session.query(Order).filter(Order.start_time == start_time).count() == 0):
+        raise ValidationError("Order exists")
+
+
+def validate_end_time(end_time):
+    if not (session.query(Order).filter(Order.end_time == end_time).count() == 0):
+        raise ValidationError("Order exists")
+
+
 class AddOrder(SQLAlchemyAutoSchema):
     class Meta:
         model = Order
         include_relationships = False
         include_fk = True
         load_instance = True
+
     id_user = fields.Integer(validate=validate_id_user)
     id_audience = fields.Integer(validate=validate_id_audience)
 
@@ -82,6 +97,3 @@ class AddOrder(SQLAlchemyAutoSchema):
 class UpdateOrder(Schema):
     id_user = fields.Integer()
     id_audience = fields.Integer()
-
-
-
