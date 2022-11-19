@@ -1,8 +1,8 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DATETIME
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DATETIME, BOOLEAN
 from sqlalchemy.orm import declarative_base, sessionmaker, scoped_session
 
 
-engine = create_engine('mysql://root:759486@localhost/pp')
+engine = create_engine('mysql://root:ab?sad132FF..@localhost:3306/7var')
 SessionFactory = sessionmaker(bind=engine)
 Session = scoped_session(SessionFactory)
 Base = declarative_base()
@@ -18,6 +18,7 @@ class Users(Base):
     email = Column('email', String(45))
     password = Column('password', String(400))
     phone = Column('phone', String(10))
+    isAdmin = Column('isAdmin', BOOLEAN, default=False)
 
 
 class Audience(Base):
