@@ -2,46 +2,54 @@
 
 Левицький Максим, варіант 7
 
-('python 3.7.*', 'poetry)
 
-# розгортання 
-    Щоб розгорнути проект, завантажити файли репозиторію і дуже важливо відкривати зразу через **PYCHARM**
+# deployment 
+    Download project and after that it would be easy to open with PYCHARM IDE
 
-    Бажано погратись з налаштуваннями інтерпретатора до проекту, хоча pycharm мав би автоматично це зробити    
+    Choose python poetry interpreter upper 3.7.6 if PYCHARM haven't done it already   
 
-    запустити команди:
+    Run command:
     poetry update
-    poetry shell
-    Запусти app.py
-    Сервер запущений
+    poetry shell   - creating virtual environment
     
-    Якщо крашиться, то мб попробуйте видалити і перезаписати poetry файли
+    run app.py
+    So, Flask server is working now  
+    
+    If failed with poetry, deleting and rewriting poetry might helt (for me it helped once) 
 
-    sqlalchemy, alembic, flask, waitress, marshmallow, mysqlclient, flask_bcrypt, flask_httpauth - залежності
+# database setting
+    
+    You should enter databese connection info in alembic.ini file
+    For example:
+    sqlalchemy.url = mysql://user:password@localhost:3306/mydb
 
-# це база
+    And paste it also in 10 line in params of create_engine function in models.py
+
+
+    Command to migrate database on your own 
+
+    alembic upgrade head  
     
-    Стандартні команди для бази    
-    
+    Or if you haven't any file in alembic/versions/
+
     alembic revision --autogenerate -m "Create models"
     alembic upgrade head   
 
-# Команди 
+# Commands 
     
-    Посилання на файл з командами в постман.
+    Link to commands list via postman
 
-    Щодо методів...всі прописані в app.py, в db_utils.py допоміжні функції для роботи з базою, 
-    в schemas.py моделі маршмелоу для валідації полів і тд.
+    All method are written in app.py, database model in models.py, 
+    methods schemas in schemas.py and there are also some util files
 
-# Нюанси авторизації
+# Authorization
     
-    Використана basic авторизація, є користувачі звичайні смертні і адміни безсмертні.
+    Basic_auth is used. 
 
-    Адмін створюється вручну, передавши відповідний параметр isAdmin = True, щоб не можна було
-    створювати адмінів просто так. Адміни мають доступ до керування авдиторіями, користувачі можуть тільки
-    отримати інформацію про неї. Також можна додати можливість змінювати і модифікувати все, але це
-    якщо попросять і заплатять)))
+    Admin can be created manually setting appropriate param isAdmin = True.
+    All users can be created via standart post method. 
+    Admins can post, change and delete audience. Users can only get information about it.
 
-    Користувачі можуть отримувати з get методів інформацію тільки про себе, з путів можуть змінювати тільки
-    інформацію, яка стосується тільки їх і тд.
-    В разі чого можна модифікувати для get
+    Users can retrieve from get method informartion only about themselves, update only themselves
+    and delete as well.
+    It can be modified for need.
