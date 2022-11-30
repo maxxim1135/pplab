@@ -1,14 +1,43 @@
-from marshmallow import Schema, fields, validate, ValidationError
+"""
+File with schemas which use on post, get, update methods, also some validation functions
+"""
+
+
+from marshmallow import Schema, fields, ValidationError
 from werkzeug.security import generate_password_hash
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from flask_bcrypt import generate_password_hash
-
 from models import *
 
 
-def validate_email(emeil1):
-    if not (session.query(Users).filter(Users.email == emeil1).count() == 0):
+session = Session()
+
+
+def validate_email(email):
+    if not (session.query(Users).filter(Users.email == email).count() == 0):
         raise ValidationError("Email exists")
+
+
+def validate_id_user(id_user):
+    if session.query(Users).filter_by(user_id=id_user).count() == 0:
+        return False
+    return True
+
+
+def validate_id_audience(id_audience):
+    if session.query(Audience).filter_by(audience_id=id_audience).count() == 0:
+        return False
+    return True
+
+
+def validate_start_time(start_time):
+    if not (session.query(Order).filter(Order.start_time == start_time).count() == 0):
+        raise ValidationError("Order exists")
+
+
+def validate_end_time(end_time):
+    if not (session.query(Order).filter(Order.end_time == end_time).count() == 0):
+        raise ValidationError("Order exists")
 
 
 class UserInfo(Schema):
@@ -30,6 +59,9 @@ class UserRegister(Schema):
 
 
 class UserToUpdate(Schema):
+    username = fields.String()
+    firstname = fields.String()
+    lastname = fields.String()
     email = fields.Email(validate=validate_email)
     password = fields.Function(
         deserialize=lambda obj: generate_password_hash(obj), load_only=True
@@ -55,31 +87,6 @@ class OrderInfo(Schema):
     id_audience = fields.Integer()
 
 
-session = Session()
-
-
-def validate_id_user(id_user):
-    if session.query(Users).filter_by(user_id=id_user).count() == 0:
-        return False
-    return True
-
-
-def validate_id_audience(id_audience):
-    if session.query(Audience).filter_by(audience_id=id_audience).count() == 0:
-        return False
-    return True
-
-
-def validate_start_time(start_time):
-    if not (session.query(Order).filter(Order.start_time == start_time).count() == 0):
-        raise ValidationError("Order exists")
-
-
-def validate_end_time(end_time):
-    if not (session.query(Order).filter(Order.end_time == end_time).count() == 0):
-        raise ValidationError("Order exists")
-
-
 class AddOrder(SQLAlchemyAutoSchema):
     class Meta:
         model = Order
@@ -97,3 +104,5 @@ class AddOrder(SQLAlchemyAutoSchema):
 class UpdateOrder(Schema):
     id_user = fields.Integer()
     id_audience = fields.Integer()
+    start_time = fields.String()
+    end_time = fields.String()
